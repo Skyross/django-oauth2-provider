@@ -1,0 +1,70 @@
+stages:
+  - test
+  - publish
+
+test-py36-django111:
+  image: $ARTIFACTORY_DOCKER_REGISTRY/infrastructure/docker-libpy-test:0.13.1
+  stage: test
+  script: tox -e py36-django111
+  tags:
+    - docker
+  only:
+    - branches
+    - tags
+
+test-py36-django20:
+  image: $ARTIFACTORY_DOCKER_REGISTRY/infrastructure/docker-libpy-test:0.13.1
+  stage: test
+  script: tox -e py36-django20
+  tags:
+    - docker
+  only:
+    - branches
+    - tags
+
+test-py36-django21:
+  image: $ARTIFACTORY_DOCKER_REGISTRY/infrastructure/docker-libpy-test:0.13.1
+  stage: test
+  script: tox -e py36-django21
+  tags:
+    - docker
+  only:
+    - branches
+    - tags
+
+test-py37-django20:
+  image: $ARTIFACTORY_DOCKER_REGISTRY/infrastructure/docker-libpy-test:0.15
+  stage: test
+  script: tox -e py37-django20
+  tags:
+    - docker
+  only:
+    - branches
+    - tags
+
+test-py37-django21:
+  image: $ARTIFACTORY_DOCKER_REGISTRY/infrastructure/docker-libpy-test:0.15
+  stage: test
+  script: tox -e py37-django21
+  coverage: '/\d+\%\s*$/'
+  tags:
+    - docker
+  only:
+    - branches
+    - tags
+
+publish-api-package:
+  stage: publish
+  image: $ARTIFACTORY_DOCKER_REGISTRY/infrastructure/docker-libpy-test:0.13.1
+  script:
+    - pip3.6 install wheel
+    - python3.6 setup.py sdist bdist_wheel
+    - twine upload
+      --repository-url=$ARTIFACTORY_PYPI_REPOSITORY
+      --username=$ARTIFACTORY_USERNAME
+      --password=$ARTIFACTORY_PASSWORD
+      dist/*
+  tags:
+    - docker
+  only:
+    - tags
